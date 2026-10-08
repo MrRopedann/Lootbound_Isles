@@ -36,6 +36,8 @@
 
 # Visual Studio cache directory
 .vs/
+.vscode/
+.idea/
 
 # Gradle cache directory
 .gradle/
@@ -71,6 +73,7 @@ sysinfo.txt
 mono_crash.*
 
 # Builds
+Build.zip
 *.apk
 *.aab
 *.unitypackage
@@ -107,3 +110,8 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cb44c0ca0d5a2b44841dd8701f355b6, type: 3}
+  m_Name: BossEnemyDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Enemies.EnemyDefinition
+  enemyId: main_boss_zone_01
+  enemyType: 3
+  maxHealth: 300
+  moveSpeed: 2.5
+  damage: 25
+  detectionRange: 15
+  attackRange: 2.2
+  attackCooldown: 1.2
+  accuracy: 100
+  evasion: 100
+  defense: 0
+  criticalChance: 0
+  leashRange: 12
+  homeArrivalRadius: 0.5
+  returnStuckTimeout: 3
+  returnProgressDistance: 0.1
+  experienceReward: 100
+  zoneUnlockedOnFirstKill: {fileID: 11400000, guid: 85f4411aff9a06d40a42fe7a129383a6, type: 2}

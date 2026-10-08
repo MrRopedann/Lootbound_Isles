@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01577b1eacf0e504b821896b6b81ed27, type: 3}
+  m_Name: GreatSwordDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Weapons.WeaponDefinition
+  weaponType: 1
+  damage: 100
+  attackRange: 3
+  attackCooldown: 2
+  greatSwordAngle: 90
+  maxTargets: 3
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 12
+  projectileLifetime: 10

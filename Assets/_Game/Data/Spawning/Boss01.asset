@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e436a93d16541a478f114aba32dc6d9, type: 3}
+  m_Name: Boss01
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Spawning.SpawnCycleDefinition
+  enemyPrefab: {fileID: 3079173065519262326, guid: df9957574a55ba0489d5068a179adb84, type: 3}
+  enemiesPerWave: 1
+  wavesPerCycle: 1
+  enemySpawnDelay: 0
+  waveDelay: 0
+  cycleCooldownMinutes: 0.5
+  spawnRadius: 1
+  navMeshSampleDistance: 3

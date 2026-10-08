@@ -1,5 +1,9 @@
 <img width="2172" height="724" alt="Логотип Lootbound Isles_ острова сокровищ" src="https://github.com/user-attachments/assets/64a3e09f-d2f6-4973-8830-e42158d6031b" />
 
+<img width="1536" height="1024" alt="Концепт-арт мира Lootbound Isles" src="https://github.com/user-attachments/assets/c44b079e-829e-459d-8916-11e806453836" />
+
+
+
 Lootbound Isles — начало большого приключения!
 
 Хотим представить вам наш новый игровой проект — Lootbound Isles!

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 998d63ae046e4f842988f046cc736f37, type: 3}
+  m_Name: GemUpgradeRules
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Inventory.GemUpgradeRules
+  goldCostByTargetLevel: 64000000c8000000900100002003000040060000800c00000019000000320000
+  successChanceByTargetLevel:
+  - 1
+  - 0.85
+  - 0.75
+  - 0.65
+  - 0.55
+  - 0.45
+  - 0.35
+  - 0.25
+  maximumSuccessChance: 0.95
+  protectionStone: {fileID: 11400000, guid: a8d5e7632b3adff4395b4d91e31a0410, type: 2}
+  catalysts:
+  - definition: {fileID: 11400000, guid: 4c90733e95a8e634393145713b38a333, type: 2}
+    successChanceBonus: 0.05
+  - definition: {fileID: 11400000, guid: bf2fb53ae4a3cf449913a20876c5d546, type: 2}
+    successChanceBonus: 0.1
+  - definition: {fileID: 11400000, guid: 4da02df3b37f043409e6e7d190d8c546, type: 2}
+    successChanceBonus: 0.15

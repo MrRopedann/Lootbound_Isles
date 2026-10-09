@@ -1,4 +1,5 @@
 using System;
+using LootboundIsles.Inventory;
 using LootboundIsles.Save;
 using UnityEngine;
 
@@ -66,6 +67,30 @@ namespace LootboundIsles.Economy
                 return false;
             }
 
+            NotifyBalanceChanged();
+            return true;
+        }
+
+        public bool TrySpendGoldForInventory(int amount, InventorySaveData inventory)
+        {
+            if (amount <= 0 || amount > Gold || inventory == null)
+                return false;
+            int nextGold = Gold - amount;
+            if (!saveSystem.SaveWalletAndInventory(nextGold, Piastres, inventory))
+                return false;
+            Gold = nextGold;
+            NotifyBalanceChanged();
+            return true;
+        }
+
+        public bool TryAddGoldForInventory(int amount, InventorySaveData inventory)
+        {
+            if (amount <= 0 || inventory == null)
+                return false;
+            int nextGold = AddWithoutOverflow(Gold, amount);
+            if (nextGold == Gold || !saveSystem.SaveWalletAndInventory(nextGold, Piastres, inventory))
+                return false;
+            Gold = nextGold;
             NotifyBalanceChanged();
             return true;
         }

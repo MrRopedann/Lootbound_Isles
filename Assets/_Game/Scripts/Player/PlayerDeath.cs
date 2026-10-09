@@ -35,6 +35,8 @@ namespace LootboundIsles.Player
 
         private bool isDeathHandled;
 
+        public bool IsDead => isDeathHandled;
+
         public event Action DeathStarted;
         public event Action Respawned;
 

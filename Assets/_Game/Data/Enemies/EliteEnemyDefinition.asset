@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cb44c0ca0d5a2b44841dd8701f355b6, type: 3}
   m_Name: EliteEnemyDefinition
   m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Enemies.EnemyDefinition
+  enemyId: 
   enemyType: 1
   maxHealth: 100
   moveSpeed: 3.2
@@ -19,4 +20,14 @@ MonoBehaviour:
   detectionRange: 8
   attackRange: 1.7
   attackCooldown: 0.9
+  accuracy: 100
+  evasion: 100
+  defense: 0
+  criticalChance: 0
+  leashRange: 12
+  homeArrivalRadius: 0.5
+  returnStuckTimeout: 3
+  returnProgressDistance: 0.1
   experienceReward: 30
+  lootTable: {fileID: 11400000, guid: f2c300b8232ebf84f95af8f082ad5245, type: 2}
+  zoneUnlockedOnFirstKill: {fileID: 0}

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23666ce8841a77a4597f8d9b9889b92f, type: 3}
+  m_Name: ItemDefinitionCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Inventory.ItemDefinitionCatalog
+  definitions:
+  - {fileID: 11400000, guid: 84da99edf382b48488cfc6cddc8e92d3, type: 2}
+  - {fileID: 11400000, guid: ac7e8beef99a8b040a688e71d4077fa3, type: 2}
+  - {fileID: 11400000, guid: 206a4d0aaaaf41e4fa566b283e60767a, type: 2}
+  - {fileID: 11400000, guid: c8e7c35d9616fe84584b050d3b50710c, type: 2}
+  - {fileID: 11400000, guid: c7eb9e90794e2e64db8bedeaabefca4d, type: 2}
+  - {fileID: 11400000, guid: 2164871ce607800429b00d69a44db9f5, type: 2}
+  - {fileID: 11400000, guid: ec834aae696af8146b7d2726e0e3e3af, type: 2}
+  - {fileID: 11400000, guid: b32c000e2767a974189c88ea3fa11dec, type: 2}
+  - {fileID: 11400000, guid: feef4528b75a6394cb7518e2db174c0c, type: 2}
+  - {fileID: 11400000, guid: 0cd2f67ba63859c4aa60b0f02ba8d0f5, type: 2}
+  - {fileID: 11400000, guid: 32a6105e7d589ce43bd1a7f2b552ed10, type: 2}
+  - {fileID: 11400000, guid: 1272eff081a91ed41a6d87508751eafd, type: 2}
+  - {fileID: 11400000, guid: a8d5e7632b3adff4395b4d91e31a0410, type: 2}
+  - {fileID: 11400000, guid: 4c90733e95a8e634393145713b38a333, type: 2}
+  - {fileID: 11400000, guid: bf2fb53ae4a3cf449913a20876c5d546, type: 2}
+  - {fileID: 11400000, guid: 4da02df3b37f043409e6e7d190d8c546, type: 2}

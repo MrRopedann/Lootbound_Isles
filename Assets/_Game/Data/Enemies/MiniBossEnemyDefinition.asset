@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cb44c0ca0d5a2b44841dd8701f355b6, type: 3}
   m_Name: MiniBossEnemyDefinition
   m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Enemies.EnemyDefinition
+  enemyId: 
   enemyType: 2
   maxHealth: 250
   moveSpeed: 2.7
@@ -19,4 +20,14 @@ MonoBehaviour:
   detectionRange: 10
   attackRange: 2
   attackCooldown: 1.2
+  accuracy: 100
+  evasion: 100
+  defense: 0
+  criticalChance: 0
+  leashRange: 12
+  homeArrivalRadius: 0.5
+  returnStuckTimeout: 3
+  returnProgressDistance: 0.1
   experienceReward: 75
+  lootTable: {fileID: 11400000, guid: f71cb51faf3ed3f4e841dbae137acc63, type: 2}
+  zoneUnlockedOnFirstKill: {fileID: 0}

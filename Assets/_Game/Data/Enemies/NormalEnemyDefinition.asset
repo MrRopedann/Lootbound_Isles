@@ -12,10 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cb44c0ca0d5a2b44841dd8701f355b6, type: 3}
   m_Name: NormalEnemyDefinition
   m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Enemies.EnemyDefinition
+  enemyId: 
   enemyType: 0
   maxHealth: 30
   moveSpeed: 3
   damage: 10
+  detectionRange: 6
   attackRange: 1.5
   attackCooldown: 1
+  accuracy: 100
+  evasion: 100
+  defense: 0
+  criticalChance: 0
+  leashRange: 12
+  homeArrivalRadius: 0.5
+  returnStuckTimeout: 3
+  returnProgressDistance: 0.1
   experienceReward: 10
+  lootTable: {fileID: 11400000, guid: dcbf599bb4956f246969d57477445dd1, type: 2}
+  zoneUnlockedOnFirstKill: {fileID: 0}

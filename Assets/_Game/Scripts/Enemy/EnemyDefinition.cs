@@ -1,5 +1,6 @@
 using UnityEngine;
 using LootboundIsles.World;
+using LootboundIsles.Loot;
 
 namespace LootboundIsles.Enemies
 {
@@ -66,6 +67,9 @@ namespace LootboundIsles.Enemies
         [SerializeField, Min(0)]
         private int experienceReward = 10;
 
+        [SerializeField]
+        private LootTable lootTable;
+
         [Header("Boss Progression")]
         [SerializeField]
         private ZoneDefinition zoneUnlockedOnFirstKill;
@@ -92,6 +96,7 @@ namespace LootboundIsles.Enemies
         public float ReturnProgressDistance => returnProgressDistance;
 
         public int ExperienceReward => experienceReward;
+        public LootTable LootTable => lootTable;
         public ZoneDefinition ZoneUnlockedOnFirstKill =>
             zoneUnlockedOnFirstKill;
     }

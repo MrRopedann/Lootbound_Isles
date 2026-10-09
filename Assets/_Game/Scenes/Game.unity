@@ -652,6 +652,10 @@ GameObject:
   - component: {fileID: 86091992}
   - component: {fileID: 86091993}
   - component: {fileID: 86091994}
+  - component: {fileID: 86091995}
+  - component: {fileID: 86091996}
+  - component: {fileID: 86091997}
+  - component: {fileID: 86091998}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -684,7 +688,7 @@ CharacterController:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 86091975}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 433577954}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -925,6 +929,7 @@ MonoBehaviour:
   zones:
   - {fileID: 11400000, guid: 1fec5c480841471429f60d78e20ff7c2, type: 2}
   - {fileID: 11400000, guid: 85f4411aff9a06d40a42fe7a129383a6, type: 2}
+  saveSystem: {fileID: 0}
   isDebug: 1
 --- !u!114 &86091993
 MonoBehaviour:
@@ -952,6 +957,66 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Economy.PlayerWallet
   isDebug: 0
+--- !u!114 &86091995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86091975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8982a0e5ea58cd4aaf123fc93440fb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Inventory.PlayerInventory
+  stacks: []
+  uniqueItems: []
+  equipment: []
+  gems: []
+  catalog: {fileID: 11400000, guid: 00bb764983cc0fc4db14f38454176ec8, type: 2}
+  unresolvedStacks: []
+  unresolvedUniqueItems: []
+  unresolvedEquipment: []
+  unresolvedGems: []
+--- !u!114 &86091996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86091975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d0576905bc5fd6418c158087b135d53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Loot.LootRewardService
+  isDebug: 0
+--- !u!114 &86091997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86091975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90137f56b1741ca4bb375626e2561615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Inventory.EquipmentUpgradeService
+  rules: {fileID: 11400000, guid: b6bc5b136c05ba442bf529734db18b92, type: 2}
+--- !u!114 &86091998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86091975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 414be922394b65443aa7eea79481195b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Inventory.GemUpgradeService
+  rules: {fileID: 11400000, guid: a0f951691aaa97f46badb4e877ed1424, type: 2}
 --- !u!1 &112856162
 GameObject:
   m_ObjectHideFlags: 0
@@ -2019,6 +2084,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!134 &433577954
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1 &436202370
 GameObject:
   m_ObjectHideFlags: 0
@@ -4768,6 +4846,8 @@ GameObject:
   - component: {fileID: 1083666122}
   - component: {fileID: 1083666121}
   - component: {fileID: 1083666120}
+  - component: {fileID: 1083666125}
+  - component: {fileID: 1083666126}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -4883,6 +4963,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1083666125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083666119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 830b0212aa192dd4d81905da114bddbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.UI.InventoryUI
+--- !u!114 &1083666126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083666119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6870d994eefbcfc44af436e17ea5fb37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.UI.LootNotificationUI
 --- !u!1 &1112665607
 GameObject:
   m_ObjectHideFlags: 0

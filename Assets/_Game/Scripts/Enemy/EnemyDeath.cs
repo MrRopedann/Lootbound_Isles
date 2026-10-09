@@ -1,6 +1,7 @@
 using LootboundIsles.Combat;
 using LootboundIsles.Progression;
 using LootboundIsles.World;
+using LootboundIsles.Loot;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -25,6 +26,7 @@ namespace LootboundIsles.Enemies
 
         private ExperienceSystem playerExperience;
         private ZoneProgression playerZoneProgression;
+        private LootRewardService playerLootRewards;
 
         private bool isDeathHandled;
 
@@ -82,6 +84,9 @@ namespace LootboundIsles.Enemies
             playerZoneProgression =
                 player.GetComponent<ZoneProgression>();
 
+            playerLootRewards =
+                player.GetComponent<LootRewardService>();
+
             if (playerZoneProgression == null)
             {
                 Debug.LogError(
@@ -99,6 +104,7 @@ namespace LootboundIsles.Enemies
             isDeathHandled = true;
 
             GiveExperienceReward();
+            GiveLootReward();
 
             if (playerZoneProgression != null &&
                 enemy.Definition != null)
@@ -132,6 +138,20 @@ namespace LootboundIsles.Enemies
             playerExperience.AddExperience(
                 enemy.Definition.ExperienceReward
             );
+        }
+
+        private void GiveLootReward()
+        {
+            if (enemy.Definition == null || enemy.Definition.LootTable == null)
+                return;
+
+            if (playerLootRewards == null)
+            {
+                Debug.LogError("EnemyDeath: Player has no LootRewardService; rolled loot cannot be granted.", this);
+                return;
+            }
+
+            playerLootRewards.GiveLoot(enemy.Definition);
         }
 
         private void StopEnemy()

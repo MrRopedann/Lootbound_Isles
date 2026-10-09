@@ -29,4 +29,5 @@ MonoBehaviour:
   returnStuckTimeout: 3
   returnProgressDistance: 0.1
   experienceReward: 100
+  lootTable: {fileID: 11400000, guid: e692f36a0d14a62439fe0e581821fa07, type: 2}
   zoneUnlockedOnFirstKill: {fileID: 11400000, guid: 85f4411aff9a06d40a42fe7a129383a6, type: 2}

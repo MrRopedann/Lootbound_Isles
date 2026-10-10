@@ -22,6 +22,27 @@ namespace LootboundIsles.Inventory
         public GemStatFamily StatFamily => statFamily;
         public IReadOnlyList<string> AllowedEquipmentSlotIds => allowedEquipmentSlotIds;
 
+        public bool AllowsEquipmentSlot(string equipmentSlotId)
+        {
+            if (string.IsNullOrWhiteSpace(equipmentSlotId) || allowedEquipmentSlotIds == null)
+                return false;
+
+            string requestedId = equipmentSlotId.Trim();
+            foreach (string allowedId in allowedEquipmentSlotIds)
+            {
+                if (string.Equals(allowedId?.Trim(), requestedId, System.StringComparison.Ordinal))
+                    return true;
+            }
+            return false;
+        }
+
+        public bool IsCompatibleWith(ItemDefinition equipmentDefinition)
+        {
+            return equipmentDefinition != null &&
+                   equipmentDefinition.Category == ItemCategory.Equipment &&
+                   AllowsEquipmentSlot(equipmentDefinition.EquipmentSlotId);
+        }
+
         private void OnValidate()
         {
             if (allowedEquipmentSlotIds == null)

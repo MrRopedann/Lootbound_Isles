@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 190a31c23ad9c9746a731db732f3af1b, type: 3}
+  m_Name: GemExtractionRules
+  m_EditorClassIdentifier: Assembly-CSharp::LootboundIsles.Inventory.GemExtractionRules
+  goldCostPerSocket: 250
+  chancesByGemLevel:
+  - success: 0.7
+    downgrade: 0.2
+    destroy: 0.1
+  - success: 0.68
+    downgrade: 0.22
+    destroy: 0.1
+  - success: 0.66
+    downgrade: 0.23
+    destroy: 0.11
+  - success: 0.64
+    downgrade: 0.24
+    destroy: 0.12
+  - success: 0.62
+    downgrade: 0.25
+    destroy: 0.13
+  - success: 0.6
+    downgrade: 0.26
+    destroy: 0.14
+  - success: 0.58
+    downgrade: 0.27
+    destroy: 0.15
+  - success: 0.56
+    downgrade: 0.28
+    destroy: 0.16
+  - success: 0.54
+    downgrade: 0.29
+    destroy: 0.17
+  catalysts: []

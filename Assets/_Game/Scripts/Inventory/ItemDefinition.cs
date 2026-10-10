@@ -41,10 +41,14 @@ namespace LootboundIsles.Inventory
         [SerializeField]
         private bool isStackable = true;
 
+        [SerializeField, Tooltip("Stable data ID used to match Equipment with compatible Gems. Configure only for Equipment definitions.")]
+        private string equipmentSlotId;
+
         public string ItemId => itemId;
         public string DisplayName => displayName;
         public ItemCategory Category => category;
         public ItemRarity Rarity => rarity;
+        public string EquipmentSlotId => category == ItemCategory.Equipment ? equipmentSlotId : null;
 
         // Equipment and Gems carry per-instance state and are never stacked.
         public bool IsStackable =>
@@ -54,6 +58,7 @@ namespace LootboundIsles.Inventory
         {
             itemId = itemId?.Trim();
             displayName = displayName?.Trim();
+            equipmentSlotId = category == ItemCategory.Equipment ? equipmentSlotId?.Trim() : null;
 
             if (category == ItemCategory.Equipment || category == ItemCategory.Gems)
             {

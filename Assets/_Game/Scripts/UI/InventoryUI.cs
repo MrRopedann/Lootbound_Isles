@@ -20,6 +20,7 @@ namespace LootboundIsles.UI
         };
 
         private readonly List<Button> categoryButtons = new();
+        private readonly List<Button> gemSocketButtons = new();
         private PlayerInventory inventory;
         private PlayerWallet wallet;
         private UpgradeSystem upgrades;
@@ -34,12 +35,16 @@ namespace LootboundIsles.UI
         private Button upgradeButton;
         private Button sellButton;
         private Button dismantleButton;
+        private Button installGemButton;
         private EquipmentUpgradeService equipmentUpgrades;
         private GemUpgradeService gemUpgrades;
+        private GemInstallationService gemInstallation;
         private InventoryAction pendingAction;
-        private enum InventoryAction { None, Upgrade, Sell, Dismantle, Exchange, GemUpgrade }
+        private enum InventoryAction { None, Upgrade, Sell, Dismantle, Exchange, GemUpgrade, InstallGem }
         private ItemCategory selectedCategory;
         private string selectedInstanceId;
+        private string installationEquipmentInstanceId;
+        private int installationSocketIndex = -1;
         private ItemDefinition selectedDefinition;
         private bool selectedIsEquipment;
         private bool selectedIsGem;
@@ -63,6 +68,7 @@ namespace LootboundIsles.UI
             upgrades = inventory.GetComponent<UpgradeSystem>();
             equipmentUpgrades = inventory.GetComponent<EquipmentUpgradeService>();
             gemUpgrades = inventory.GetComponent<GemUpgradeService>();
+            gemInstallation = inventory.GetComponent<GemInstallationService>();
             death = inventory.GetComponent<PlayerDeath>();
             BuildUI();
         }
@@ -142,6 +148,16 @@ namespace LootboundIsles.UI
             Image detailImage = detail.gameObject.AddComponent<Image>(); detailImage.color = new Color(.1f, .13f, .15f, 1f);
             selectionText = MakeText("Selection", detail, "Select an item", new Vector2(.07f, .83f), new Vector2(.93f, .98f), font, 23, TextAlignmentOptions.Left);
             detailsText = MakeText("ItemDetails", detail, "", new Vector2(.07f, .3f), new Vector2(.93f, .8f), font, 17, TextAlignmentOptions.TopLeft);
+            for (int i = 0; i < EquipmentInstance.SocketCount; i++)
+            {
+                int socketIndex = i;
+                float x0 = .07f + i * .3f;
+                Button socket = MakeButton($"GemSocket{i + 1}", detail, $"Socket {i + 1}: Empty",
+                    new Vector2(x0, .31f), new Vector2(x0 + .28f, .42f), Vector2.zero, Vector2.zero, font, 12);
+                socket.onClick.AddListener(() => SelectInstallationSocket(socketIndex));
+                socket.gameObject.SetActive(false);
+                gemSocketButtons.Add(socket);
+            }
             lockButton = MakeButton("LockButton", detail, "Lock", new Vector2(.53f, .07f), new Vector2(.93f, .18f), Vector2.zero, Vector2.zero, font, 16);
             lockButton.onClick.AddListener(ToggleLock);
             upgradeButton = MakeButton("UpgradeButton", detail, "Upgrade", new Vector2(.07f, .07f), new Vector2(.47f, .18f), Vector2.zero, Vector2.zero, font, 16);
@@ -150,6 +166,9 @@ namespace LootboundIsles.UI
             sellButton.onClick.AddListener(() => { if (selectedIsGem) ToggleGemProtection(); else RequestAction(InventoryAction.Sell); });
             dismantleButton = MakeButton("DismantleButton", detail, "Dismantle", new Vector2(.53f, .19f), new Vector2(.93f, .3f), Vector2.zero, Vector2.zero, font, 16);
             dismantleButton.onClick.AddListener(() => { if (selectedIsGem) CycleGemCatalyst(); else RequestAction(InventoryAction.Dismantle); });
+            installGemButton = MakeButton("InstallGemButton", detail, "Install Gem", new Vector2(.53f, .07f), new Vector2(.93f, .18f), Vector2.zero, Vector2.zero, font, 16);
+            installGemButton.onClick.AddListener(() => RequestAction(InventoryAction.InstallGem));
+            installGemButton.gameObject.SetActive(false);
             panel.SetActive(false);
         }
 
@@ -187,6 +206,9 @@ namespace LootboundIsles.UI
         {
             pendingAction = InventoryAction.None;
             selectedCategory = category; selectedInstanceId = null; selectedDefinition = null;
+            selectedIsEquipment = false; selectedIsGem = false;
+            if (category != ItemCategory.Equipment && category != ItemCategory.Gems)
+                ClearInstallationSelection();
             ResetGemUpgradeOptions();
             Refresh();
         }
@@ -250,15 +272,44 @@ namespace LootboundIsles.UI
             LayoutElement element = row.gameObject.AddComponent<LayoutElement>(); element.minHeight = 48; element.preferredHeight = 48;
             if (definition != null) row.GetComponentInChildren<TMP_Text>().color = RarityColors[(int)definition.Rarity];
             string id = instanceId;
-            row.onClick.AddListener(() => { pendingAction = InventoryAction.None; selectedDefinition = definition; selectedInstanceId = id; selectedIsEquipment = isEquipment; selectedIsGem = isGem; ResetGemUpgradeOptions(); RefreshDetails(); });
+            row.onClick.AddListener(() =>
+            {
+                pendingAction = InventoryAction.None;
+                selectedDefinition = definition;
+                selectedInstanceId = id;
+                selectedIsEquipment = isEquipment;
+                selectedIsGem = isGem;
+                if (isEquipment)
+                {
+                    installationEquipmentInstanceId = id;
+                    installationSocketIndex = -1;
+                }
+                else if (!isGem)
+                    ClearInstallationSelection();
+                ResetGemUpgradeOptions();
+                RefreshDetails();
+            });
             if (isEquipment && isLocked) row.GetComponent<Image>().color = new Color(.24f, .21f, .29f);
         }
 
         private void RefreshDetails()
         {
+            foreach (Button socket in gemSocketButtons) socket.gameObject.SetActive(false);
+            installGemButton.gameObject.SetActive(false);
+            detailsText.rectTransform.anchorMin = new Vector2(.07f, .3f);
+            detailsText.rectTransform.anchorMax = new Vector2(.93f, .8f);
             if (selectedDefinition == null)
             {
-                selectionText.SetText("Select an item"); detailsText.SetText("Items received from loot go directly into inventory.\n\nInventory stays open during combat and does not pause the world.");
+                if (!string.IsNullOrEmpty(installationEquipmentInstanceId) && installationSocketIndex >= 0)
+                {
+                    selectionText.SetText("Choose a Gem");
+                    detailsText.SetText($"Select one compatible Gem from your inventory for socket {installationSocketIndex + 1}.\n\nInstallation is guaranteed and costs {gemInstallation?.Rules?.GoldCost ?? 0} Gold.");
+                }
+                else
+                {
+                    selectionText.SetText("Select an item");
+                    detailsText.SetText("Items received from loot go directly into inventory.\n\nInventory stays open during combat and does not pause the world.");
+                }
                 lockButton.gameObject.SetActive(false); upgradeButton.gameObject.SetActive(false);
                 sellButton.gameObject.SetActive(false); dismantleButton.gameObject.SetActive(false); return;
             }
@@ -294,7 +345,23 @@ namespace LootboundIsles.UI
                         : item.Level >= 10 ? "Maximum Level reached." : "Upgrade unavailable: missing donor, fragments, Gold, or setup.";
                     int sale = equipmentUpgrades == null ? 0 : equipmentUpgrades.GetSellValue(item.InstanceId);
                     int yield = equipmentUpgrades == null ? 0 : equipmentUpgrades.GetDismantleYield(item.InstanceId);
-                    detailsText.SetText($"Category: Equipment\nRarity: {selectedDefinition.Rarity}\nLevel: {item.Level}\nEfficiency: {item.Efficiency:F0}%\nStatus: {(item.IsLocked ? "Locked" : "Unlocked")}\n\n{costs}\nSell: {sale:N0} Gold · Dismantle: {yield} {selectedDefinition.Rarity} Fragment(s)\nItem ID: {selectedDefinition.ItemId}");
+                    detailsText.rectTransform.anchorMin = new Vector2(.07f, .44f);
+                    detailsText.rectTransform.anchorMax = new Vector2(.93f, .8f);
+                    detailsText.SetText($"Category: Equipment\nRarity: {selectedDefinition.Rarity}\nLevel: {item.Level}\nEfficiency: {item.Efficiency:F0}%\nStatus: {(item.IsLocked ? "Locked" : "Unlocked")}\n\n{costs}\nSell: {sale:N0} Gold · Dismantle: {yield} {selectedDefinition.Rarity} Fragment(s)\nSlot ID: {item.Definition.EquipmentSlotId ?? "Not configured"}");
+                    for (int i = 0; i < gemSocketButtons.Count; i++)
+                    {
+                        GemInstance socketedGem = item.SocketedGems[i];
+                        Button socket = gemSocketButtons[i];
+                        socket.gameObject.SetActive(true);
+                        bool hasSocketContent = item.HasSocketContent(i);
+                        socket.GetComponentInChildren<TMP_Text>().SetText(socketedGem == null
+                            ? hasSocketContent ? $"Socket {i + 1}: Unavailable" : $"Socket {i + 1}: Empty"
+                            : $"Socket {i + 1}: {socketedGem.Definition.DisplayName} Lv{socketedGem.Level}");
+                        socket.interactable = !hasSocketContent && !string.IsNullOrWhiteSpace(item.Definition.EquipmentSlotId);
+                        socket.GetComponent<Image>().color = installationEquipmentInstanceId == item.InstanceId && installationSocketIndex == i
+                            ? new Color(.35f, .49f, .47f)
+                            : new Color(.18f, .24f, .26f, .98f);
+                    }
                 }
                 lockButton.GetComponentInChildren<TMP_Text>().SetText(item != null && item.IsLocked ? "Unlock item" : "Lock item");
                 upgradeButton.interactable = affordable || pendingAction == InventoryAction.Upgrade;
@@ -327,6 +394,17 @@ namespace LootboundIsles.UI
                     : $"Success chance: {successChance:P0}\nFailure: donor and Gold are consumed; main Gem loses 1 level{(useGemProtection ? " (protected)" : "")}.";
                 detailsText.SetText($"Category: Gem\nRarity: {selectedDefinition.Rarity}\nLevel: {gem?.Level ?? 1}\nStat family: {(gem == null ? "Unknown" : gem.Definition.StatFamily.ToString())}\n\n{donorText}\nGold cost: {(canUpgrade ? goldCost.ToString("N0") : "—")} (you have {(wallet == null ? 0 : wallet.Gold):N0})\n{optionText}{(string.IsNullOrEmpty(gemUpgradeMessage) ? "" : "\n\n" + gemUpgradeMessage)}");
 
+                if (!string.IsNullOrEmpty(installationEquipmentInstanceId) && installationSocketIndex >= 0 && gemInstallation != null)
+                {
+                    bool canInstall = gemInstallation.TryGetInstallationInfo(installationEquipmentInstanceId,
+                        installationSocketIndex, selectedInstanceId, out EquipmentInstance targetEquipment,
+                        out _, out int installationCost, out string reason);
+                    detailsText.SetText($"{detailsText.text}\n\nInstall into: {targetEquipment?.Definition.DisplayName ?? "selected Equipment"}, socket {installationSocketIndex + 1}\nInstall cost: {installationCost:N0} Gold\n{(canInstall ? "Guaranteed installation." : reason)}");
+                    installGemButton.gameObject.SetActive(true);
+                    installGemButton.interactable = canInstall || pendingAction == InventoryAction.InstallGem;
+                    installGemButton.GetComponentInChildren<TMP_Text>().SetText(pendingAction == InventoryAction.InstallGem ? "Confirm" : "Install Gem");
+                }
+
                 upgradeButton.interactable = affordable || pendingAction == InventoryAction.GemUpgrade;
                 upgradeButton.GetComponentInChildren<TMP_Text>().SetText(pendingAction == InventoryAction.GemUpgrade ? "Confirm" : "Upgrade Gem");
                 sellButton.GetComponentInChildren<TMP_Text>().SetText(
@@ -355,7 +433,8 @@ namespace LootboundIsles.UI
         private void RequestAction(InventoryAction action)
         {
             if (action == InventoryAction.GemUpgrade && gemUpgrades == null) return;
-            if (action != InventoryAction.GemUpgrade && equipmentUpgrades == null) return;
+            if (action == InventoryAction.InstallGem && gemInstallation == null) return;
+            if (action != InventoryAction.GemUpgrade && action != InventoryAction.InstallGem && equipmentUpgrades == null) return;
             if (pendingAction != action)
             {
                 pendingAction = action;
@@ -377,6 +456,19 @@ namespace LootboundIsles.UI
                     }
                     : result == GemUpgradeResult.SaveFailed ? "Upgrade could not be saved; no costs were kept." :
                         $"Upgrade unavailable. Chance: {chance:P0}; check the donor, materials and Gold.";
+            }
+            else if (action == InventoryAction.InstallGem)
+            {
+                success = gemInstallation.TryInstall(installationEquipmentInstanceId, installationSocketIndex, selectedInstanceId);
+                if (success)
+                {
+                    selectedCategory = ItemCategory.Equipment;
+                    selectedDefinition = null;
+                    selectedInstanceId = null;
+                    selectedIsEquipment = false;
+                    selectedIsGem = false;
+                    ClearInstallationSelection();
+                }
             }
             else success = action switch
             {
@@ -434,6 +526,24 @@ namespace LootboundIsles.UI
             useGemProtection = false;
             selectedCatalystIndex = -1;
             gemUpgradeMessage = null;
+        }
+
+        private void SelectInstallationSocket(int socketIndex)
+        {
+            EquipmentInstance equipment = FindEquipment(installationEquipmentInstanceId);
+            if (equipment?.Definition == null || socketIndex < 0 || socketIndex >= EquipmentInstance.SocketCount ||
+                equipment.HasSocketContent(socketIndex) || string.IsNullOrWhiteSpace(equipment.Definition.EquipmentSlotId))
+                return;
+
+            installationSocketIndex = socketIndex;
+            pendingAction = InventoryAction.None;
+            RefreshDetails();
+        }
+
+        private void ClearInstallationSelection()
+        {
+            installationEquipmentInstanceId = null;
+            installationSocketIndex = -1;
         }
 
         private EquipmentInstance FindEquipment(string id)

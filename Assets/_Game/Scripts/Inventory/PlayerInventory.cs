@@ -67,6 +67,13 @@ namespace LootboundIsles.Inventory
         public bool IsLocked => isLocked;
         public IReadOnlyList<GemInstance> SocketedGems => socketedGems;
 
+        public bool HasSocketContent(int index)
+        {
+            return index >= 0 && index < SocketCount &&
+                   ((socketedGems != null && index < socketedGems.Length && socketedGems[index] != null) ||
+                    (unresolvedSocketedGems != null && index < unresolvedSocketedGems.Length && unresolvedSocketedGems[index] != null));
+        }
+
         internal EquipmentInstance(ItemDefinition definition, string restoredId = null, int restoredLevel = 1, float restoredEfficiency = 100f, bool restoredLocked = false)
         {
             instanceId = string.IsNullOrWhiteSpace(restoredId) ? Guid.NewGuid().ToString("N") : restoredId;
@@ -91,6 +98,62 @@ namespace LootboundIsles.Inventory
         internal void RestoreSocket(int index, GemInstance gem)
         {
             if (index < 0 || index >= SocketCount) return;
+            socketedGems[index] = gem;
+            unresolvedSocketedGems[index] = null;
+        }
+
+        internal bool CanInstallGem(int index, GemInstance gem)
+        {
+            if (index < 0 || index >= SocketCount || gem?.Definition == null ||
+                Definition == null || HasSocketContent(index) ||
+                !gem.Definition.IsCompatibleWith(Definition))
+                return false;
+
+            for (int i = 0; i < SocketCount; i++)
+            {
+                GemInstance socketedGem = socketedGems != null && i < socketedGems.Length ? socketedGems[i] : null;
+                if (socketedGem?.Definition == gem.Definition)
+                    return false;
+                GemSaveData unresolved = unresolvedSocketedGems != null && i < unresolvedSocketedGems.Length
+                    ? unresolvedSocketedGems[i]
+                    : null;
+                if (unresolved != null && unresolved.itemId == gem.Definition.ItemId)
+                    return false;
+            }
+
+            return true;
+        }
+
+        internal bool TryInstallGem(int index, GemInstance gem)
+        {
+            if (!CanInstallGem(index, gem)) return false;
+            socketedGems[index] = gem;
+            unresolvedSocketedGems[index] = null;
+            return true;
+        }
+
+        internal void RemoveInstalledGem(int index, GemInstance gem)
+        {
+            if (index < 0 || index >= SocketCount || socketedGems[index] != gem) return;
+            socketedGems[index] = null;
+        }
+
+        internal GemInstance ExtractInstalledGem(int index)
+        {
+            if (index < 0 || index >= SocketCount ||
+                socketedGems == null || index >= socketedGems.Length ||
+                unresolvedSocketedGems == null || index >= unresolvedSocketedGems.Length ||
+                unresolvedSocketedGems[index] != null)
+                return null;
+
+            GemInstance gem = socketedGems[index];
+            socketedGems[index] = null;
+            return gem;
+        }
+
+        internal void RestoreExtractedGem(int index, GemInstance gem)
+        {
+            if (index < 0 || index >= SocketCount || gem == null) return;
             socketedGems[index] = gem;
             unresolvedSocketedGems[index] = null;
         }
@@ -367,6 +430,108 @@ namespace LootboundIsles.Inventory
             }
             Changed?.Invoke();
             return true;
+        }
+
+        public bool TryInstallGem(string equipmentInstanceId, int socketIndex, string gemInstanceId,
+            int goldCost, LootboundIsles.Economy.PlayerWallet wallet)
+        {
+            EnsureCollections();
+            EquipmentInstance target = FindEquipment(equipmentInstanceId);
+            GemInstance gem = gems.Find(candidate => candidate != null && candidate.InstanceId == gemInstanceId);
+            if (target == null || gem == null || !target.CanInstallGem(socketIndex, gem) ||
+                goldCost <= 0 || wallet == null || wallet.Gold < goldCost)
+                return false;
+
+            int gemIndex = gems.IndexOf(gem);
+            if (!target.TryInstallGem(socketIndex, gem)) return false;
+            gems.RemoveAt(gemIndex);
+
+            if (!wallet.TrySpendGoldForInventory(goldCost, CreateSaveData()))
+            {
+                target.RemoveInstalledGem(socketIndex, gem);
+                gems.Insert(gemIndex, gem);
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool TryExtractGems(string equipmentInstanceId, IReadOnlyList<int> socketIndexes,
+            IReadOnlyList<GemExtractionOutcome> outcomes, int goldCost, ItemDefinition catalyst,
+            LootboundIsles.Economy.PlayerWallet wallet)
+        {
+            EnsureCollections();
+            EquipmentInstance target = FindEquipment(equipmentInstanceId);
+            if (target == null || socketIndexes == null || outcomes == null || socketIndexes.Count == 0 ||
+                socketIndexes.Count != outcomes.Count || goldCost <= 0 || wallet == null || wallet.Gold < goldCost ||
+                !IsValidGemExtractionMaterial(catalyst))
+                return false;
+
+            InventoryStack catalystStack = catalyst == null ? null : FindStack(catalyst);
+            if (catalyst != null && (catalystStack == null || catalystStack.Quantity < 1)) return false;
+
+            HashSet<int> uniqueSockets = new();
+            List<GemInstance> removedGems = new(socketIndexes.Count);
+            List<int> originalLevels = new(socketIndexes.Count);
+            for (int i = 0; i < socketIndexes.Count; i++)
+            {
+                int socketIndex = socketIndexes[i];
+                if (socketIndex < 0 || socketIndex >= EquipmentInstance.SocketCount || !uniqueSockets.Add(socketIndex) ||
+                    !target.HasSocketContent(socketIndex) || target.SocketedGems[socketIndex] == null ||
+                    outcomes[i] == null || !outcomes[i].IsValid ||
+                    outcomes[i].SocketIndex != socketIndex || outcomes[i].OriginalGem != target.SocketedGems[socketIndex])
+                    return false;
+                removedGems.Add(target.SocketedGems[socketIndex]);
+                originalLevels.Add(target.SocketedGems[socketIndex].Level);
+            }
+
+            StackState catalystState = RemoveOneFromStack(catalystStack);
+            List<GemInstance> extracted = new(socketIndexes.Count);
+            for (int i = 0; i < socketIndexes.Count; i++)
+            {
+                GemInstance gem = target.ExtractInstalledGem(socketIndexes[i]);
+                if (gem == null)
+                {
+                    for (int rollbackIndex = 0; rollbackIndex < i; rollbackIndex++)
+                    {
+                        removedGems[rollbackIndex].SetLevel(originalLevels[rollbackIndex]);
+                        target.RestoreExtractedGem(socketIndexes[rollbackIndex], removedGems[rollbackIndex]);
+                    }
+                    RestoreStack(catalystState);
+                    return false;
+                }
+
+                GemExtractionOutcome outcome = outcomes[i];
+                gem.SetLevel(outcome.ReturnedLevel > 0 ? outcome.ReturnedLevel : originalLevels[i]);
+                if (outcome.ReturnsGem)
+                {
+                    gems.Add(gem);
+                    extracted.Add(gem);
+                }
+                else extracted.Add(null);
+            }
+
+            if (!wallet.TrySpendGoldForInventory(goldCost, CreateSaveData()))
+            {
+                for (int i = 0; i < socketIndexes.Count; i++)
+                {
+                    if (extracted[i] != null) gems.Remove(extracted[i]);
+                    removedGems[i].SetLevel(originalLevels[i]);
+                    target.RestoreExtractedGem(socketIndexes[i], removedGems[i]);
+                }
+                RestoreStack(catalystState);
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
+        private static bool IsValidGemExtractionMaterial(ItemDefinition definition)
+        {
+            return definition == null ||
+                   (definition.Category == ItemCategory.Materials && definition.IsStackable);
         }
 
         public bool TryUpgradeGem(string targetId, string donorId, int goldCost,

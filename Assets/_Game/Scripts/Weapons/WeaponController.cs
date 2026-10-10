@@ -40,6 +40,7 @@ namespace LootboundIsles.Weapons
             Mathf.Max(0f, attackTimer);
 
         public event Action<WeaponDefinition> WeaponChanged;
+        public event Action<WeaponType> AttackStarted;
 
         private void Awake()
         {
@@ -181,6 +182,8 @@ namespace LootboundIsles.Weapons
                     weaponDefinition.AttackCooldown
                 );
 
+            AttackStarted?.Invoke(weaponDefinition.WeaponType);
+
             AttackResult result =
                 combatResolver.ResolveAttack(
                     finalDamage,
@@ -254,6 +257,8 @@ namespace LootboundIsles.Weapons
                 playerStats.GetFinalAttackCooldown(
                     weaponDefinition.AttackCooldown
                 );
+
+            AttackStarted?.Invoke(weaponDefinition.WeaponType);
 
             float finalDamage =
                 playerStats.GetFinalDamage(
@@ -365,6 +370,8 @@ namespace LootboundIsles.Weapons
                 playerStats.GetFinalAttackCooldown(
                     weaponDefinition.AttackCooldown
                 );
+
+            AttackStarted?.Invoke(weaponDefinition.WeaponType);
 
             if (isDebug)
             {
